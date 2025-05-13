@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { BookOpen, BarChart2, Library, Home, Menu, X } from "lucide-react";
+import { BookOpen, BarChart2, Library, Home, Menu, X, Info } from "lucide-react";
 import { useState } from "react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 
@@ -38,6 +38,11 @@ const navItems = [
     name: "Blogs",
     href: "/blog",
     icon: BookOpen,
+  },
+  {
+    name: "About Us",
+    href: "/about-us",
+    icon: Info,
   }
 ];
 
