@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { BookOpen, BarChart2, Library, Home, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { ModeToggle } from "@/components/layout/mode-toggle";
 
 const navItems = [
   {
@@ -33,6 +34,11 @@ const navItems = [
     href: "/resource-library",
     icon: Library,
   },
+  {
+    name: "Blogs",
+    href: "/blog",
+    icon: BookOpen,
+  }
 ];
 
 export function Navbar() {
@@ -66,22 +72,25 @@ export function Navbar() {
               </Link>
             );
           })}
+          <ModeToggle />
         </nav>
         
         {/* Mobile menu button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-          <span className="sr-only">Toggle menu</span>
-        </Button>
+        <div className="flex items-center gap-2 md:hidden">
+          <ModeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+            <span className="sr-only">Toggle menu</span>
+          </Button>
+        </div>
       </div>
       
       {/* Mobile navigation */}
