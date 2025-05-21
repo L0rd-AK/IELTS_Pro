@@ -47,7 +47,7 @@ export default function Home() {
             <div className="relative">
               <div className="aspect-video bg-muted rounded-lg overflow-hidden shadow-xl">
                 <img 
-                  src="/images/hero-image.jpg" 
+                  src="https://i.ibb.co/rKpvWpfb/image-2025-05-22-002133974.png" 
                   alt="Student preparing for IELTS" 
                   className="w-full h-full object-cover"
                 />
@@ -159,7 +159,7 @@ export default function Home() {
                 </div>
                 <div className="rounded-lg overflow-hidden shadow-lg">
                   <img 
-                    src="/images/listening-section.jpg" 
+                    src="https://i.ibb.co/yBK37CnL/image-2025-05-22-002641415.png" 
                     alt="IELTS Listening Practice" 
                     className="w-full h-auto"
                   />
@@ -196,7 +196,7 @@ export default function Home() {
                 </div>
                 <div className="rounded-lg overflow-hidden shadow-lg">
                   <img 
-                    src="/images/reading-section.jpg" 
+                    src="https://i.ibb.co/spmd0X46/image-2025-05-22-002826586.png" 
                     alt="IELTS Reading Practice" 
                     className="w-full h-auto"
                   />
@@ -233,7 +233,7 @@ export default function Home() {
                 </div>
                 <div className="rounded-lg overflow-hidden shadow-lg">
                   <img 
-                    src="/images/writing-section.jpg" 
+                    src="https://i.ibb.co/SDkCkmHN/image-2025-05-22-002912579.png" 
                     alt="IELTS Writing Practice" 
                     className="w-full h-auto"
                   />
@@ -270,7 +270,7 @@ export default function Home() {
                 </div>
                 <div className="rounded-lg overflow-hidden shadow-lg">
                   <img 
-                    src="/images/speaking-section.jpg" 
+                    src="https://i.ibb.co/23WhctDh/image-2025-05-22-003028166.png" 
                     alt="IELTS Speaking Practice" 
                     className="w-full h-auto"
                   />
@@ -403,7 +403,7 @@ export default function Home() {
             </div>
             <div className="rounded-lg overflow-hidden shadow-lg">
               <img 
-                src="/images/world-map.jpg" 
+                src="https://i.ibb.co/JRGF55tR/image-2025-05-22-002341005.png" 
                 alt="World map showing IELTS Pro's global reach" 
                 className="w-full h-auto"
               />
