@@ -1,20 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { BookOpen, BarChart2, Library, Home, Menu, X, Info, MessageSquare } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { AuthButtons } from "../ui/auth-buttons";
+import { useAuth } from "@/contexts/auth-context";
 
-const navItems = [
+const publicNavItems = [
   {
     name: "Home",
     href: "/",
     icon: Home,
   },
+  {
+    name: "Blogs",
+    href: "/blog",
+    icon: BookOpen,
+  },
+  {
+    name: "About Us",
+    href: "/about-us",
+    icon: Info,
+  },
+  {
+    name: "Contact",
+    href: "/contact",
+    icon: MessageSquare,
+  }
+];
+
+const protectedNavItems = [
   {
     name: "Dashboard",
     href: "/dashboard",
@@ -35,26 +54,16 @@ const navItems = [
     href: "/resource-library",
     icon: Library,
   },
-  {
-    name: "Blogs",
-    href: "/blog",
-    icon: BookOpen,
-  },
-  {
-    name: "About Us",
-    href: "/about-us",
-    icon: Info,
-  },
-  {
-    name: "Contact",
-    href: "/contact",
-    icon: MessageSquare,
-  }
 ];
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
+  
+  // Determine which nav items to show based on authentication status
+  const navItems = [...publicNavItems, ...(user ? protectedNavItems : [])];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur px-5 mx-auto supports-[backdrop-filter]:bg-background/60">

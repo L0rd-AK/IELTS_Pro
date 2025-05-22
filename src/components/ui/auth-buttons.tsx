@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { LogIn, LogOut, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function AuthButtons() {
   const { user, signInWithGoogle, logout } = useAuth();
+  const router = useRouter();
+
+  const handleSignIn = async () => {
+    await signInWithGoogle();
+    // Redirect will happen after auth state changes and useEffect in AuthContext updates
+  };
 
   return (
     <div>
@@ -50,7 +57,7 @@ export function AuthButtons() {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <Button onClick={signInWithGoogle} size="sm" className="gap-2">
+        <Button onClick={handleSignIn} size="sm" className="gap-2">
           <LogIn className="h-4 w-4" />
           Sign In
         </Button>

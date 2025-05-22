@@ -8,6 +8,7 @@ import {
   onAuthStateChanged 
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { useRouter } from 'next/navigation';
 
 type AuthContextType = {
   user: User | null;
@@ -26,15 +27,21 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
+      
+      // Redirect to dashboard if user logs in
+      if (user) {
+        router.push('/dashboard');
+      }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   const signInWithGoogle = async () => {
     try {
@@ -48,6 +55,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     try {
       await signOut(auth);
+      // Redirect to home page after logout
+      router.push('/');
     } catch (error) {
       console.error('Error signing out', error);
     }
