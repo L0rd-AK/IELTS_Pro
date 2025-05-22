@@ -1,14 +1,43 @@
 'use client';
 
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { type CarouselApi, Carousel, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { BookOpen, BarChart2, Library, CheckCircle, Award, Clock, ArrowRight, Sparkles, Globe, Users } from "lucide-react";
-
+import { BookOpen, BarChart2, Library, CheckCircle, Award, Clock, ArrowRight, Sparkles, Globe, Users, Video, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import Marquee from "react-fast-marquee";
+// ... rest of your imports
 export default function Home() {
+  const [isLiveSessionOpen, setIsLiveSessionOpen] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  
+  const startLiveSession = async () => {
+    setIsLiveSessionOpen(true);
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: true, 
+        audio: true 
+      });
+      setStream(mediaStream);
+      setCameraActive(true);
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+    }
+  };
+  
+  const endLiveSession = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+    setCameraActive(false);
+    setIsLiveSessionOpen(false);
+  };
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -111,7 +140,101 @@ export default function Home() {
           </div>
         </div>
       </section>
-
+      <section className="py-16 px-4 md:px-6 bg-gradient-to-r from-primary/5 to-background">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+              <Badge className="mb-4" variant="secondary">Live Practice</Badge>
+              <h2 className="text-3xl font-bold mb-4">Join a Live IELTS Session</h2>
+              <p className="text-xl text-muted-foreground mb-6">
+                Practice with expert tutors in real-time. Get immediate feedback and improve your skills through interactive sessions.
+              </p>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5" />
+                  <span>Live speaking practice with tutors</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5" />
+                  <span>Group discussion sessions</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5" />
+                  <span>Real-time writing feedback</span>
+                </li>
+              </ul>
+              <Button size="lg" onClick={startLiveSession} className="gap-2">
+                <Video className="h-5 w-5" />
+                Join Live Session
+              </Button>
+            </div>
+            <div className="relative rounded-lg overflow-hidden shadow-xl border border-muted">
+              <img 
+                src="https://i.ibb.co/zVPhhZdT/image-2025-05-23-041134481.png" 
+                alt="Live IELTS tutoring session" 
+                className="w-full h-auto"
+              />
+              <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-foreground opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-foreground"></span>
+                </span>
+                Live Now
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Live Session Dialog */}
+      <Dialog open={isLiveSessionOpen} onOpenChange={setIsLiveSessionOpen}>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Live IELTS Practice Session</DialogTitle>
+            <DialogDescription>
+              You are now in a live session. Your camera and microphone are active.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 relative">
+            {cameraActive ? (
+              <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                <video 
+                  ref={(videoElement) => {
+                    if (videoElement && stream) {
+                      videoElement.srcObject = stream;
+                      videoElement.play();
+                    }
+                  }}
+                  autoPlay 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    className="rounded-full w-12 h-12 flex items-center justify-center"
+                    onClick={endLiveSession}
+                  >
+                    <X className="h-6 w-6" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                <p className="text-muted-foreground">Camera access required for live session</p>
+              </div>
+            )}
+          </div>
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              Tip: Make sure you're in a quiet environment with good lighting for the best experience.
+            </p>
+          </div>
+          <DialogClose asChild>
+            <Button variant="outline" onClick={endLiveSession}>End Session</Button>
+          </DialogClose>
+        </DialogContent>
+      </Dialog>
       {/* Test Sections */}
       <section className="py-16 px-4 md:px-6 bg-muted/50">
         <div className="container mx-auto max-w-6xl">
@@ -411,7 +534,39 @@ export default function Home() {
           </div>
         </div>
       </section>
-
+      {/* Partner Companies Section */}
+      <section className="py-12 px-4 md:px-6 bg-background border-y">
+        <div className="container mx-auto max-w-6xl mb-6">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold">Our Trusted Partners</h2>
+            <p className="text-muted-foreground">Collaborating with leading organizations to deliver excellence in IELTS preparation</p>
+          </div>
+        </div>
+        
+        {/* Import at the top of your file: import Marquee from "react-fast-marquee"; */}
+        <Marquee 
+          speed={40} 
+          gradientWidth={50}
+          pauseOnHover={true}
+        >
+          {[
+            { name: "Mentor", logo: "https://placehold.co/200x80/e2e8f0/475569?text=Mentor" },
+            { name: "BARC", logo: "https://placehold.co/200x80/e2e8f0/475569?text=BARC" },
+            { name: "Shafin", logo: "https://placehold.co/200x80/e2e8f0/475569?text=Shafin" },
+            { name: "Bangla-IELTS", logo: "https://placehold.co/200x80/e2e8f0/475569?text=Bangla-IELTS" },
+          ].map((partner, index) => (
+            <div key={index} className="mx-8 flex items-center justify-center">
+              <div className="bg-card rounded-lg p-6 shadow-sm border h-24 w-48 flex items-center justify-center transition-transform hover:scale-105">
+                <img 
+                  src={partner.logo} 
+                  alt={`${partner.name} logo`} 
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+            </div>
+          ))}
+        </Marquee>
+      </section>
       {/* CTA Section */}
       <section className="py-16 px-4 md:px-6 bg-muted">
         <div className="container mx-auto max-w-6xl">
