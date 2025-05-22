@@ -1,21 +1,40 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { type CarouselApi, Carousel, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { BookOpen, BarChart2, Library, CheckCircle, Award, Clock, ArrowRight, Sparkles, Globe, Users, Video, X } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { BookOpen, BarChart2, Library, CheckCircle, Award, Clock, ArrowRight, Sparkles, Globe, Users, Video, X, ExternalLink } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose, DialogFooter } from "@/components/ui/dialog";
 import Marquee from "react-fast-marquee";
 // ... rest of your imports
 export default function Home() {
   const [isLiveSessionOpen, setIsLiveSessionOpen] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [showW3Popup, setShowW3Popup] = useState(false);
   
+  useEffect(() => {
+    const hasSeenPopup = sessionStorage.getItem('hasSeenW3Popup');
+    //if (!hasSeenPopup) {
+      // Show popup after a short delay for better UX
+      const timer = setTimeout(() => {
+        setShowW3Popup(true);
+        // Mark as seen for this session
+        sessionStorage.setItem('hasSeenW3Popup', 'true');
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    //}
+  }, []);
+  
+  const closeW3Popup = () => {
+    setShowW3Popup(false);
+  };
+
   const startLiveSession = async () => {
     setIsLiveSessionOpen(true);
     try {
@@ -40,6 +59,51 @@ export default function Home() {
   };
   return (
     <div className="flex flex-col min-h-screen">
+      {/* W3Schools Affiliate Marketing Popup */}
+      <Dialog open={showW3Popup} onOpenChange={setShowW3Popup}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+              <span className="text-[#04AA6D]">W3Schools</span> <span>Learning Resources</span>
+            </DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              Enhance your IELTS preparation with additional web development skills
+            </DialogDescription>
+          </DialogHeader>
+          <div className="my-2 space-y-4">
+            <div className="flex justify-center">
+              <img 
+                src="https://www.w3schools.com/images/w3schools_logo.png" 
+                alt="W3Schools Logo" 
+                className="h-16 object-contain"
+              />
+            </div>
+            <p className="text-center">
+              Learning web development can boost your English skills through practical application. 
+              W3Schools offers free tutorials in HTML, CSS, JavaScript and more.
+            </p>
+            <div className="bg-[#E7E9EB] p-4 rounded-md">
+              <p className="font-medium text-center text-[#04AA6D]">
+                Special offer for IELTS Pro students: Get 15% off W3Schools Premium
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button variant="outline" onClick={closeW3Popup} className="sm:mr-auto">
+              Maybe Later
+            </Button>
+            <Button 
+              className="bg-[#04AA6D] hover:bg-[#059862] text-white flex items-center gap-2"
+              onClick={() => {
+                window.open('https://www.w3schools.com', '_blank');
+                closeW3Popup();
+              }}
+            >
+              Visit W3Schools <ExternalLink className="h-4 w-4" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* Hero Section */}
       <section className="py-20 px-4 md:px-6 bg-gradient-to-r from-primary/10 via-primary/5 to-background">
         <div className="container mx-auto max-w-6xl">
