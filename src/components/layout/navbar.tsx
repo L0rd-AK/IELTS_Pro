@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, BarChart2, Library, Home, Menu, X, Info, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
+import { AuthButtons } from "../ui/auth-buttons";
 
 const navItems = [
   {
@@ -82,12 +83,16 @@ export function Navbar() {
               </Link>
             );
           })}
-          <ModeToggle />
+          <div className="flex items-center gap-4">
+            <ModeToggle />
+            <AuthButtons />
+          </div>
         </nav>
         
         {/* Mobile menu button */}
         <div className="flex items-center gap-2 md:hidden">
           <ModeToggle />
+          <AuthButtons />
           <Button
             variant="ghost"
             size="icon"

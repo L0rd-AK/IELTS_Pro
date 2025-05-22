@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-
+import { ProtectedRoute } from "@/components/auth/protected-route";
 const data = [
   {name: 'Reading', score: 7.5},
   {name: 'Writing', score: 6.5},
@@ -23,6 +23,7 @@ export default function Dashboard() {
   const overallScore = (data.reduce((acc, item) => acc + item.score, 0) / data.length).toFixed(1);
 
   return (
+    <ProtectedRoute>
     <PageContainer title="Dashboard" description="Overview of your IELTS progress and performance.">
       <div className="grid gap-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -129,5 +130,6 @@ export default function Dashboard() {
         </Card>
       </div>
     </PageContainer>
+    </ProtectedRoute>
   );
 }
