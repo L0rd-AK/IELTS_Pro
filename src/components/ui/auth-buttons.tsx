@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { LogIn, LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,13 +16,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function AuthButtons() {
-  const { user, signInWithGoogle, logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
-
-  const handleSignIn = async () => {
-    await signInWithGoogle();
-    // Redirect will happen after auth state changes and useEffect in AuthContext updates
-  };
 
   return (
     <div>
@@ -43,13 +39,16 @@ export function AuthButtons() {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user.displayName}</p>
+                <p className="text-sm font-medium leading-none">{user.displayName || user.email}</p>
                 <p className="text-xs leading-none text-muted-foreground">
                   {user.email}
                 </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+              Dashboard
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={logout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
@@ -57,10 +56,14 @@ export function AuthButtons() {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <Button onClick={handleSignIn} size="sm" className="gap-2">
-          <LogIn className="h-4 w-4" />
-          Sign In
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild size="sm" variant="ghost">
+            <Link href="/login">Log In</Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/signup">Sign Up</Link>
+          </Button>
+        </div>
       )}
     </div>
   );
