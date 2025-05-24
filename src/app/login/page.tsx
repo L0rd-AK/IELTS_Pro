@@ -12,6 +12,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
+import type { UserCredential } from 'firebase/auth';
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -23,11 +25,8 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Reset error
     setError('');
     
-    // Validate form
     if (!email || !password) {
       setError('Email and password are required');
       return;
@@ -36,11 +35,7 @@ export default function LoginPage() {
     try {
       setLoading(true);
       
-      // Sign in with email and password
-      await signInWithEmailAndPassword(auth, email, password);
-      
-      // Redirect to dashboard
-      router.push('/dashboard');
+      router.push('/');
     } catch (error: any) {
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
         setError('Invalid email or password');
@@ -56,6 +51,57 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+// Update the handleGoogleSignIn function
+const handleGoogleSignIn = async () => {
+  try {
+    setLoading(true);
+    setError('');
+
+    if (!signInWithGoogle) {
+      throw new Error('Google sign in not initialized');
+    }
+
+    // Try to sign in with Google
+    const result = await (signInWithGoogle() as unknown as Promise<UserCredential>);
+    
+    if (!result || !result.user) {
+      throw new Error('No user data returned from Google sign in');
+    }
+
+    // Prepare user data
+    const userData = {
+      email: result.user.email,
+      displayName: result.user.displayName || '',
+      photoURL: result.user.photoURL || '',
+      role: 'user'
+    };
+
+    // Post to your API
+    const response = await fetch('http://localhost:5000/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('User data saved:', data);
+
+    // Navigate to dashboard
+    router.push('/dashboard');
+  } catch (error: any) {
+    console.error('Sign in error:', error);
+    setError(error.message || 'Failed to sign in with Google');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] p-4">
@@ -83,6 +129,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
+                disabled={loading}
               />
             </div>
             
@@ -94,6 +141,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                disabled={loading}
               />
             </div>
             
@@ -122,7 +170,8 @@ export default function LoginPage() {
               type="button" 
               variant="outline" 
               className="w-full"
-              onClick={signInWithGoogle}
+              onClick={handleGoogleSignIn}
+              disabled={loading}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -143,7 +192,7 @@ export default function LoginPage() {
                 />
                 <path d="M1 1h22v22H1z" fill="none" />
               </svg>
-              Google
+              {loading ? 'Signing in...' : 'Google'}
             </Button>
           </form>
         </CardContent>

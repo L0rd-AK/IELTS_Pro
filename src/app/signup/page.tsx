@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -12,6 +12,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
+
+
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,58 +22,65 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  // Modify the handleSignup function
+const handleSignup = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError('');
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Reset error
-    setError('');
-    
-    // Validate form
-    if (!email || !password || !confirmPassword || !displayName) {
-      setError('All fields are required');
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      
-      // Create user with email and password
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Update profile with display name
-      await updateProfile(userCredential.user, {
-        displayName: displayName
-      });
-      
-      // Redirect to dashboard
-      router.push('/dashboard');
-    } catch (error: any) {
-      if (error.code === 'auth/email-already-in-use') {
-        setError('Email is already in use');
-      } else if (error.code === 'auth/invalid-email') {
-        setError('Invalid email address');
-      } else if (error.code === 'auth/weak-password') {
-        setError('Password is too weak');
-      } else {
-        setError('Failed to create an account. Please try again.');
-        console.error(error);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Form validation
+  if (!email || !password || !confirmPassword || !displayName) {
+    setError('All fields are required');
+    return;
+  }
 
+  if (password !== confirmPassword) {
+    setError('Passwords do not match');
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    // Create user in Firebase
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    
+    // Update Firebase user profile
+    await updateProfile(userCredential.user, {
+      displayName: displayName
+    });
+
+    // Create user in backend
+    const response = await fetch('http://localhost:5000/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        displayName,
+        uid: userCredential.user.uid,
+        role: 'user'
+      }),
+    });
+
+    if (!response.ok) {
+      // If backend fails, delete Firebase user
+      await userCredential.user.delete();
+      throw new Error('Failed to create account in backend');
+    }
+
+    const data = await response.json();
+    console.log('Account created:', data);
+
+    // Redirect to login
+    router.push('/login');
+  } catch (error: any) {
+    console.error('Signup error:', error);
+    setError(error.message || 'Failed to create account. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] p-4">
       <Card className="w-full max-w-md">
