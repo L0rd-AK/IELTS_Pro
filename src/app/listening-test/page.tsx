@@ -28,22 +28,22 @@ export default function ListeningTest() {
     {
       title: "Section 1: Daily Life Conversation",
       description: "A conversation between two people set in an everyday social context.",
-      audioUrl: "/audio/ielts-listening-sample.mp3",
+      audioUrl: "/audio/sample1.mp3",
     },
     {
       title: "Section 2: Public Announcement",
       description: "A monologue set in an everyday social context, e.g., a speech about local facilities.",
-      audioUrl: "/audio/ielts-listening-sample.mp3",
+      audioUrl: "/audio/sample2.mp3",
     },
     {
       title: "Section 3: Academic Discussion",
       description: "A conversation between up to four people set in an educational context.",
-      audioUrl: "/audio/ielts-listening-sample.mp3",
+      audioUrl: "/audio/sample3.mp3",
     },
     {
       title: "Section 4: Academic Lecture",
       description: "A monologue on an academic subject.",
-      audioUrl: "/audio/ielts-listening-sample.mp3",
+      audioUrl: "/audio/sample2.mp3",
     }
   ];
 

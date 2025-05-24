@@ -21,23 +21,24 @@ export default function WritingTest() {
   const [currentTask, setCurrentTask] = useState<'task1' | 'task2'>('task1');
   const [task1Prompt, setTask1Prompt] = useState<string>('');
   const [task2Prompt, setTask2Prompt] = useState<string>('');
+  const [task1Image, setTask1Image] = useState<string>('');
 
   // Sample task prompts
   const task1Prompts = [
     {
       title: "Line Graph",
       description: "The graph below shows the changes in the amount of time spent by people in the UK on different leisure activities between 2000 and 2020.\n\nSummarize the information by selecting and reporting the main features, and make comparisons where relevant.",
-      image: "/images/line-graph.png"
+      image: "https://i.ibb.co/xKmRvKWH/image-2025-05-25-012052881.png"
     },
     {
       title: "Bar Chart",
       description: "The chart below shows the percentage of people who used different types of transportation to travel to work in a European city in 2000 and 2020.\n\nSummarize the information by selecting and reporting the main features, and make comparisons where relevant.",
-      image: "/images/bar-chart.png"
+      image: "https://i.ibb.co/wVn77xS/image-2025-05-25-012225027.png"
     },
     {
       title: "Process Diagram",
       description: "The diagram below shows the process of making chocolate from cocoa beans.\n\nSummarize the information by selecting and reporting the main features, and make comparisons where relevant.",
-      image: "/images/process-diagram.png"
+      image: "https://i.ibb.co/60x0fzx2/image-2025-05-25-012328527.png"
     }
   ];
 
@@ -62,6 +63,7 @@ export default function WritingTest() {
     const randomTask2 = task2Prompts[Math.floor(Math.random() * task2Prompts.length)];
     setTask1Prompt(randomTask1.description);
     setTask2Prompt(randomTask2.description);
+    setTask1Image(randomTask1.image);
   }, []);
 
   // Timer effect
@@ -197,10 +199,19 @@ export default function WritingTest() {
               <CardContent>
                 <div className="mb-6 p-4 bg-muted rounded-md">
                   <p className="whitespace-pre-line">{task1Prompt}</p>
-                  {/* Placeholder for image - in a real app, you would display the actual image */}
-                  <div className="mt-4 w-full h-64 bg-gray-200 flex items-center justify-center rounded-md">
-                    <p className="text-muted-foreground">Graph/Chart Image Would Appear Here</p>
-                  </div>
+                  {task1Image ? (
+                    <div className="mt-4 w-full flex justify-center rounded-md">
+                      <img 
+                        src={task1Image} 
+                        alt="Task 1 Chart or Diagram" 
+                        className="max-w-full h-auto rounded-md" 
+                      />
+                    </div>
+                  ) : (
+                    <div className="mt-4 w-full h-64 bg-gray-200 flex items-center justify-center rounded-md">
+                      <p className="text-muted-foreground">Graph/Chart Image Would Appear Here</p>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-4">
@@ -347,6 +358,7 @@ export default function WritingTest() {
                 const randomTask2 = task2Prompts[Math.floor(Math.random() * task2Prompts.length)];
                 setTask1Prompt(randomTask1.description);
                 setTask2Prompt(randomTask2.description);
+                setTask1Image(randomTask1.image);
               }}>
                 Take Another Test
               </Button>
