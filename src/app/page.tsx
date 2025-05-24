@@ -6,17 +6,48 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { type CarouselApi, Carousel, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { type CarouselApi, Carousel, CarouselItem, CarouselNext, CarouselPrevious, CarouselContent } from "@/components/ui/carousel";
 import { BookOpen, BarChart2, Library, CheckCircle, Award, Clock, ArrowRight, Sparkles, Globe, Users, Video, X, ExternalLink } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose, DialogFooter } from "@/components/ui/dialog";
 import Marquee from "react-fast-marquee";
-// ... rest of your imports
+
 export default function Home() {
   const [isLiveSessionOpen, setIsLiveSessionOpen] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [showW3Popup, setShowW3Popup] = useState(false);
   
+  const testimonials = [
+    {
+      name: "Raj Patel",
+      location: "India",
+      score: "Band 8.0",
+      quote: "IELTS Pro helped me achieve my dream score on the first attempt. The personalized feedback on my writing was invaluable.",
+      image: "/images/testimonial-1.jpg"
+    },
+    {
+      name: "Maria Gonzalez",
+      location: "Mexico",
+      score: "Band 7.5",
+      quote: "After struggling with the speaking section for months, the targeted practice exercises from IELTS Pro helped me improve by 1.5 bands!",
+      image: "/images/testimonial-2.jpg"
+    },
+    {
+      name: "Liu Wei",
+      location: "China",
+      score: "Band 7.0",
+      quote: "The reading strategies I learned through IELTS Pro completely changed my approach to the test. I finally got the score I needed for my university application.",
+      image: "/images/testimonial-3.jpg"
+    },
+    {
+      name: "Sophia Müller",
+      location: "Germany",
+      score: "Band 8.5",
+      quote: "The practice tests were so similar to the actual exam that I felt completely prepared on test day. Thank you IELTS Pro!",
+      image: "/images/testimonial-4.jpg"
+    }
+  ];
+
   useEffect(() => {
     const hasSeenPopup = sessionStorage.getItem('hasSeenW3Popup');
     //if (!hasSeenPopup) {
@@ -488,70 +519,45 @@ export default function Home() {
             </p>
           </div>
           
-          <Carousel className="w-full">
-            <CarouselNext>
-              {[
-                {
-                  name: "Raj Patel",
-                  location: "India",
-                  score: "Band 8.0",
-                  quote: "IELTS Pro helped me achieve my dream score on the first attempt. The personalized feedback on my writing was invaluable.",
-                  image: "/images/testimonial-1.jpg"
-                },
-                {
-                  name: "Maria Gonzalez",
-                  location: "Mexico",
-                  score: "Band 7.5",
-                  quote: "After struggling with the speaking section for months, the targeted practice exercises from IELTS Pro helped me improve by 1.5 bands!",
-                  image: "/images/testimonial-2.jpg"
-                },
-                {
-                  name: "Liu Wei",
-                  location: "China",
-                  score: "Band 7.0",
-                  quote: "The reading strategies I learned through IELTS Pro completely changed my approach to the test. I finally got the score I needed for my university application.",
-                  image: "/images/testimonial-3.jpg"
-                },
-                {
-                  name: "Sophia Müller",
-                  location: "Germany",
-                  score: "Band 8.5",
-                  quote: "The practice tests were so similar to the actual exam that I felt completely prepared on test day. Thank you IELTS Pro!",
-                  image: "/images/testimonial-4.jpg"
-                }
-              ].map((testimonial, index) => (
-                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-                  <Card className="h-full border-none shadow-md">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 rounded-full bg-primary/20 overflow-hidden">
-                          <img 
-                            src={testimonial.image} 
-                            alt={testimonial.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.src = `https://ui-avatars.com/api/?name=${testimonial.name.replace(' ', '+')}&background=random`;
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <p className="font-medium">{testimonial.name}</p>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>{testimonial.location}</span>
-                            <span>•</span>
-                            <span className="font-medium text-primary">{testimonial.score}</span>
+          <div className="relative">
+            <Carousel opts={{ align: "start" }} className="w-full">
+              <CarouselContent>
+                {testimonials.map((testimonial, index) => (
+                  <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 pl-4">
+                    <Card className="h-full border-none shadow-md">
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="w-12 h-12 rounded-full bg-primary/20 overflow-hidden">
+                            <img 
+                              src={testimonial.image} 
+                              alt={testimonial.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = `https://ui-avatars.com/api/?name=${testimonial.name.replace(' ', '+')}&background=random`;
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <p className="font-medium">{testimonial.name}</p>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <span>{testimonial.location}</span>
+                              <span>•</span>
+                              <span className="font-medium text-primary">{testimonial.score}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <p className="italic">"{testimonial.quote}"</p>
-                    </CardContent>
-                  </Card>
-                </CarouselItem>
-              ))}
-            </CarouselNext>
-            <CarouselPrevious className="left-2" />
-            <CarouselNext className="right-2" />
-          </Carousel>
+                        <p className="italic">{testimonial.quote}</p>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="hidden md:block">
+                <CarouselPrevious className="-left-12" />
+                <CarouselNext className="-right-12" />
+              </div>
+            </Carousel>
+          </div>
         </div>
       </section>
 
