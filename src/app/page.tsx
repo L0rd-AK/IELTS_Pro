@@ -59,32 +59,42 @@ export default function Home() {
   };
   return (
     <div className="flex flex-col min-h-screen">
-      {/* W3Schools Affiliate Marketing Popup */}
+      {/* Booking Session Popup */}
       <Dialog open={showW3Popup} onOpenChange={setShowW3Popup}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
-              <span className="text-[#04AA6D]">W3Schools</span> <span>Learning Resources</span>
+            <DialogTitle className="text-2xl font-bold text-center">
+              Book a Session with Munzereen Shahid
             </DialogTitle>
             <DialogDescription className="text-center pt-2">
-              Enhance your IELTS preparation with additional web development skills
+              Expert IELTS Instructor with 10+ years of experience
             </DialogDescription>
           </DialogHeader>
-          <div className="my-2 space-y-4">
+          <div className="my-4 space-y-4">
             <div className="flex justify-center">
               <img 
-                src="https://www.w3schools.com/images/w3schools_logo.png" 
-                alt="W3Schools Logo" 
-                className="h-16 object-contain"
+                src="https://i.ibb.co/nqCR8QNT/image.png" 
+                alt="Munzereen Shahid" 
+                className="w-full h-48 rounded-lg object-cover shadow-lg"
               />
             </div>
-            <p className="text-center">
-              Learning web development can boost your English skills through practical application. 
-              W3Schools offers free tutorials in HTML, CSS, JavaScript and more.
-            </p>
-            <div className="bg-[#E7E9EB] p-4 rounded-md">
-              <p className="font-medium text-center text-[#04AA6D]">
-                Special offer for IELTS Pro students: Get 15% off W3Schools Premium
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Award className="h-5 w-5 text-primary" />
+                <p>Certified IELTS Trainer</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                <p>5000+ Students Trained</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                <p>Specializes in Speaking & Writing</p>
+              </div>
+            </div>
+            <div className="bg-muted p-4 rounded-md">
+              <p className="font-medium text-center">
+                Available for one-on-one sessions and small group classes
               </p>
             </div>
           </div>
@@ -93,13 +103,13 @@ export default function Home() {
               Maybe Later
             </Button>
             <Button 
-              className="bg-[#04AA6D] hover:bg-[#059862] text-white flex items-center gap-2"
+              className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
               onClick={() => {
-                window.open('https://www.w3schools.com', '_blank');
+                window.open('https://calendly.com/munzereen-shahid', '_blank');
                 closeW3Popup();
               }}
             >
-              Visit W3Schools <ExternalLink className="h-4 w-4" />
+              Book a Session <ArrowRight className="h-4 w-4" />
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -124,7 +134,7 @@ export default function Home() {
                   <Link href="/about">Learn More</Link>
                 </Button>
               </div>
-              <div className="flex items-center mt-8 space-x-4">
+              {/* <div className="flex items-center mt-8 space-x-4">
                 <div className="flex -space-x-2">
                   {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="w-10 h-10 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-xs font-medium">
@@ -135,7 +145,7 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground">
                   Joined by <span className="font-medium">2,000+</span> students this month
                 </p>
-              </div>
+              </div> */}
             </div>
             <div className="relative">
               <div className="aspect-video bg-muted rounded-lg overflow-hidden shadow-xl">
