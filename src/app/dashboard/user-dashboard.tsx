@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { SSLCommercePayment } from '@/components/payment/ssl-commerce';
+import { CertificatePreview } from '@/components/certificate/preview';
 
 const data = [
 	{ name: 'Reading', score: 7.5 },
@@ -21,6 +23,24 @@ const historyData = [
 
 export function UserDashboard() {
 	const overallScore = (data.reduce((acc, item) => acc + item.score, 0) / data.length).toFixed(1);
+
+	const handlePaymentSuccess = async () => {
+		// Implement certificate download logic here
+		const response = await fetch('/api/certificate/download');
+		const blob = await response.blob();
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'ielts-certificate.pdf';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+	};
+
+	const handlePaymentError = (error: string) => {
+		// Handle payment error (you might want to add a toast notification here)
+		console.error(error);
+	};
 
 	return (
 		<PageContainer title="Student Dashboard" description="Your IELTS progress and performance.">
@@ -124,6 +144,36 @@ export function UserDashboard() {
 									</div>
 								</div>
 							))}
+						</div>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>IELTS Certificate</CardTitle>
+						<CardDescription>Download your official IELTS certificate</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<div className="flex flex-col items-start gap-4">
+							<div className="relative w-full group cursor-pointer">
+								<div className="filter blur-[2px] group-hover:blur-[4px] transition-all">
+									<CertificatePreview name="Your Name" overallScore={overallScore} />
+								</div>
+								<div className="absolute inset-0 bg-black/40 flex items-center justify-center flex-col gap-2">
+									<p className="text-white text-lg font-semibold">Preview Only</p>
+									<p className="text-white/80 text-sm">Purchase to download clear version</p>
+								</div>
+							</div>
+							<div className="flex items-center justify-between w-full">
+								<p className="text-sm text-muted-foreground">
+									Certificate cost: $50 USD
+								</p>
+								<SSLCommercePayment
+									amount={50}
+									onSuccess={handlePaymentSuccess}
+									onError={handlePaymentError}
+								/>
+							</div>
 						</div>
 					</CardContent>
 				</Card>
