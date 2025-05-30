@@ -11,38 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import React from 'react';
 
 const passages = [
-  {
-    title: 'The Impact of Climate Change',
-    content: `Climate change refers to significant changes in global temperatures and weather patterns over time. While climate change is a natural phenomenon, scientific evidence shows that human activities are currently driving an unprecedented rate of change. The burning of fossil fuels, deforestation, and industrial processes release greenhouse gases into the atmosphere, leading to global warming and other environmental impacts.`,
-  },
-  {
-    title: 'The Evolution of Technology',
-    content: `Technology has evolved at an unprecedented pace over the last century. From the invention of the telephone to the rise of the internet, technological advancements have transformed how we communicate, work, and live. The digital revolution has led to the creation of smartphones, artificial intelligence, and cloud computing, which continue to shape our daily lives and economies.`,
-  },
-  {
-    title: 'The Importance of Biodiversity',
-    content: `Biodiversity refers to the variety of life on Earth, including the variety of species, ecosystems, and genetic diversity within species. It is crucial for ecosystem health, providing services such as pollination, nutrient cycling, and climate regulation. However, human activities such as habitat destruction and pollution are leading to a rapid decline in biodiversity, threatening ecosystems and human well-being.`,
-  },
-  {
-    title: 'The Role of Education in Society',
-    content: `Education plays a vital role in shaping individuals and societies. It provides knowledge, skills, and values necessary for personal development and social cohesion. Education systems vary globally, but they all aim to prepare individuals for the workforce and responsible citizenship. Challenges such as access to quality education and educational inequality remain significant issues in many parts of the world.`,
-  },
-  {
-    title: 'The Future of Renewable Energy',
-    content: `Renewable energy sources, such as solar, wind, and hydroelectric power, are becoming increasingly important in the fight against climate change. These sources are sustainable and have a lower environmental impact compared to fossil fuels. The transition to renewable energy is essential for reducing greenhouse gas emissions and achieving energy security in the future.`,
-  },
-  {
-    title: 'The Significance of Mental Health Awareness',
-    content: `Mental health awareness is crucial for reducing stigma and promoting understanding of mental health issues. Mental health affects how we think, feel, and act, and it is essential for overall well-being. Increasing awareness can lead to better support systems, improved access to mental health care, and a more compassionate society.`,
-  },
-  {
-    title: 'The Challenges of Urbanization',
-    content: `Urbanization refers to the increasing population in urban areas, leading to the growth of cities. While urbanization can drive economic development and innovation, it also presents challenges such as overcrowding, pollution, and inadequate infrastructure. Sustainable urban planning is essential to address these issues and improve the quality of life for urban residents.`,
-  },
-  {
-    title: 'The Influence of Social Media on Society',
-    content: `Social media has transformed how people communicate and share information. Platforms like Facebook, Twitter, and Instagram allow users to connect with others globally, share experiences, and express opinions. However, social media also raises concerns about privacy, misinformation, and its impact on mental health, making it a complex aspect of modern society.`,
-  },
+  // ...existing passages array...
 ];
 
 interface Passage {

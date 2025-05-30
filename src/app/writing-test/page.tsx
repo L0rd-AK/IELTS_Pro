@@ -38,17 +38,17 @@ export default function WritingTest() {
     {
       title: "Process Diagram",
       description: "The diagram below shows the process of making chocolate from cocoa beans.Summarize the information by selecting and reporting the main features, and make comparisons where relevant.",
-      image: "https://i.ibb.co/60x0fzx2/image-2025-05-25-012328527.png"
+      image: "https://i.ibb.co/SD78bP0t/image-2025-05-30-192916139.png"
     },
     {
       title: "Pie Chart",
       description: "The pie chart below shows the distribution of household expenses in a country in 2020.Summarize the information by selecting and reporting the main features, and make comparisons where relevant.",
-      image: "https://i.ibb.co/4R1f3x5/image-2025-05-25-012456123.png"
+      image: "https://i.ibb.co/VWd1dFrf/image-2025-05-30-192533811.png"
     },
     {
       title: "Table",
       description: "The table below shows the average monthly temperatures in three cities in 2020.Summarize the information by selecting and reporting the main features, and make comparisons where relevant.",
-      image: "https://i.ibb.co/4R1f3x5/image-2025-05-25-012456123.png"
+      image: "https://i.ibb.co/qYWDVvTG/image-2025-05-30-192239448.png"
     }
   ];
 
