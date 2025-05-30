@@ -27,18 +27,28 @@ export default function WritingTest() {
   const task1Prompts = [
     {
       title: "Line Graph",
-      description: "The graph below shows the changes in the amount of time spent by people in the UK on different leisure activities between 2000 and 2020.\n\nSummarize the information by selecting and reporting the main features, and make comparisons where relevant.",
+      description: "The graph below shows the changes in the amount of time spent by people in the UK on different leisure activities between 2000 and 2020.Summarize the information by selecting and reporting the main features, and make comparisons where relevant.",
       image: "https://i.ibb.co/xKmRvKWH/image-2025-05-25-012052881.png"
     },
     {
       title: "Bar Chart",
-      description: "The chart below shows the percentage of people who used different types of transportation to travel to work in a European city in 2000 and 2020.\n\nSummarize the information by selecting and reporting the main features, and make comparisons where relevant.",
+      description: "The chart below shows the percentage of people who used different types of transportation to travel to work in a European city in 2000 and 2020.Summarize the information by selecting and reporting the main features, and make comparisons where relevant.",
       image: "https://i.ibb.co/wVn77xS/image-2025-05-25-012225027.png"
     },
     {
       title: "Process Diagram",
-      description: "The diagram below shows the process of making chocolate from cocoa beans.\n\nSummarize the information by selecting and reporting the main features, and make comparisons where relevant.",
+      description: "The diagram below shows the process of making chocolate from cocoa beans.Summarize the information by selecting and reporting the main features, and make comparisons where relevant.",
       image: "https://i.ibb.co/60x0fzx2/image-2025-05-25-012328527.png"
+    },
+    {
+      title: "Pie Chart",
+      description: "The pie chart below shows the distribution of household expenses in a country in 2020.Summarize the information by selecting and reporting the main features, and make comparisons where relevant.",
+      image: "https://i.ibb.co/4R1f3x5/image-2025-05-25-012456123.png"
+    },
+    {
+      title: "Table",
+      description: "The table below shows the average monthly temperatures in three cities in 2020.Summarize the information by selecting and reporting the main features, and make comparisons where relevant.",
+      image: "https://i.ibb.co/4R1f3x5/image-2025-05-25-012456123.png"
     }
   ];
 
