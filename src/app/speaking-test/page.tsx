@@ -7,20 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { Mic, MicOff, Play, Pause, StopCircle, Camera, CameraOff } from 'lucide-react';
+import { Mic, MicOff, Play, Pause, StopCircle, Camera, CameraOff, Loader2 } from 'lucide-react';
 import { evaluateSpeakingTest } from '@/ai/flows/evaluate-speaking-test';
-
-// Add type for feedback
-interface FeedbackType {
-  bandScore: number;
-  feedback: {
-    pronunciation: string;
-    fluency: string;
-    vocabulary: string;
-    grammar: string;
-    overall: string;
-  };
-}
 
 export default function SpeakingTest() {
   const [hasCameraPermission, setHasCameraPermission] = useState(false);
@@ -32,12 +20,10 @@ export default function SpeakingTest() {
   const [currentPart, setCurrentPart] = useState(0);
   const [testStarted, setTestStarted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [feedback, setFeedback] = useState<FeedbackType | null>(null);
+  const [feedback, setFeedback] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cameraActive, setCameraActive] = useState(true);
   const [transcription, setTranscription] = useState('');
-  const [isCameraLoading, setIsCameraLoading] = useState(true);
-  const [permissionDenied, setPermissionDenied] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -79,86 +65,50 @@ export default function SpeakingTest() {
 
   useEffect(() => {
     const getMediaPermissions = async () => {
-      setIsCameraLoading(true);
-      setPermissionDenied(false);
-
       try {
-        // First check if permissions are already granted
-        const permissions = await navigator.mediaDevices.getUserMedia({ 
-          video: true, 
-          audio: true 
-        });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        setHasCameraPermission(true);
+        setHasMicrophonePermission(true);
+        streamRef.current = stream;
 
         if (videoRef.current) {
-          videoRef.current.srcObject = permissions;
-          streamRef.current = permissions;
-          
-          // Wait for metadata to be loaded before playing
-          videoRef.current.onloadedmetadata = async () => {
-            try {
-              await videoRef.current?.play();
-              setHasCameraPermission(true);
-              setHasMicrophonePermission(true);
-            } catch (playError) {
-              console.error("Error playing video:", playError);
-              // Don't set camera permission to false here, just handle the play error
-              toast({
-                title: "Video Preview Error",
-                description: "Unable to preview camera, but recording will still work.",
-              });
-            }
-          };
+          videoRef.current.srcObject = stream;
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error accessing media devices:', error);
-        setPermissionDenied(true);
-
-        // Check if it's a permission error
-        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        
+        // Try to get only audio if video fails
+        try {
+          const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          setHasMicrophonePermission(true);
+          setHasCameraPermission(false);
+          streamRef.current = audioStream;
           toast({
             variant: 'destructive',
-            title: 'Permission Denied',
-            description: 'Please allow camera and microphone access in your browser settings.',
+            title: 'Camera Access Denied',
+            description: 'We\'ll proceed with audio only. For best results, please enable camera access.',
           });
-          
-          // Try audio only
-          try {
-            const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            streamRef.current = audioStream;
-            setHasMicrophonePermission(true);
-            setHasCameraPermission(false);
-            toast({
-              title: 'Audio Only Mode',
-              description: 'Proceeding with microphone only.',
-            });
-          } catch (audioError) {
-            setHasMicrophonePermission(false);
-            toast({
-              variant: 'destructive',
-              title: 'Microphone Access Required',
-              description: 'This test requires microphone access to work.',
-            });
-          }
-        } else {
-          // Handle other types of errors
+        } catch (audioError) {
+          console.error('Error accessing microphone:', audioError);
+          setHasMicrophonePermission(false);
           toast({
             variant: 'destructive',
-            title: 'Device Error',
-            description: 'Unable to access media devices. Please check your hardware.',
+            title: 'Microphone Access Denied',
+            description: 'Please enable microphone permissions in your browser settings to use this app.',
           });
         }
-      } finally {
-        setIsCameraLoading(false);
       }
     };
 
     getMediaPermissions();
-    
+
     return () => {
+      // Clean up media streams when component unmounts
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => {
-          track.stop();
-        });
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
       }
     };
   }, []);
@@ -254,104 +204,47 @@ export default function SpeakingTest() {
   };
 
   const handleSubmit = async () => {
-    setIsLoading(true);
-    setError(null);
-    
     if (!audioBlob) {
       toast({
-        variant: "destructive",
-        title: "No recording found",
-        description: "Please record your response before submitting."
+        variant: 'destructive',
+        title: 'No Recording',
+        description: 'Please record your response before submitting.',
       });
-      setIsLoading(false);
       return;
     }
 
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const audioDataUri = URL.createObjectURL(audioBlob);
-      const response = await evaluateSpeakingTest({
-        audioDataUri,
-        transcription,
-        currentPart
-      });
-      
-      if (response && typeof response === 'object') {
-        setFeedback(response as FeedbackType);
-      } else {
-        throw new Error('Invalid response format');
-      }
-    } catch (error: any) {
-      setError(error.message || "Something went wrong during evaluation");
-      toast({
-        variant: "destructive",
-        title: "Evaluation failed",
-        description: error.message || "Something went wrong"
-      });
+      // Convert blob to base64 data URI
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = async () => {
+        const base64data = reader.result as string;
+        
+        // For a real implementation, you would use speech-to-text here
+        // For now, we'll use a mock transcription based on the current part
+        const mockTranscription = speakingParts[currentPart].questions ? 
+          `Response to questions about ${speakingParts[currentPart].title}` : 
+          `Response to task: ${speakingParts[currentPart].taskCard}`;
+        
+        setTranscription(mockTranscription);
+
+        // Evaluate speaking test
+        const result = await evaluateSpeakingTest({
+          audioDataUri: base64data,
+          transcription: mockTranscription
+        });
+
+        setFeedback(result);
+      };
+    } catch (e: any) {
+      setError(e.message || 'Failed to evaluate speaking test.');
     } finally {
       setIsLoading(false);
     }
   };
-  const getMediaPermissions = async () => {
-    setIsCameraLoading(true);
-    setPermissionDenied(false);
-
-    try {
-      const permissions = await navigator.mediaDevices.getUserMedia({ 
-        video: true, 
-        audio: true 
-      });
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = permissions;
-        streamRef.current = permissions;
-        await videoRef.current.play();
-        setHasCameraPermission(true);
-        setHasMicrophonePermission(true);
-      }
-    } catch (error: any) {
-      console.error('Error accessing media devices:', error);
-      setPermissionDenied(true);
-      setHasCameraPermission(false);
-      setHasMicrophonePermission(false);
-    } finally {
-      setIsCameraLoading(false);
-    }
-  };
-
-  const initializeCamera = async () => {
-  const initializeCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
-      });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        try {
-          await videoRef.current.play();
-        } catch (e) {
-          console.error("Error playing video:", e);
-        }
-        setHasCameraPermission(true);
-        setHasMicrophonePermission(true);
-      }
-    } catch (error) {
-      console.error('Error accessing media devices:', error);
-      setHasCameraPermission(false);
-      setHasMicrophonePermission(false);
-    }
-  };
-
-  useEffect(() => {
-    initializeCamera();
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, []);
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -373,20 +266,9 @@ export default function SpeakingTest() {
               Please ensure your microphone is working properly. Having your camera on is recommended but not required.
             </p>
             <div className="flex flex-col space-y-4 mt-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className={`w-4 h-4 rounded-full ${hasMicrophonePermission ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  <span>Microphone: {hasMicrophonePermission ? 'Ready' : 'Not Available'}</span>
-                </div>
-                {permissionDenied && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={getMediaPermissions}
-                  >
-                    Retry Permissions
-                  </Button>
-                )}
+              <div className="flex items-center space-x-2">
+                <div className={`w-4 h-4 rounded-full ${hasMicrophonePermission ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                <span>Microphone: {hasMicrophonePermission ? 'Ready' : 'Not Available'}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className={`w-4 h-4 rounded-full ${hasCameraPermission ? 'bg-green-500' : 'bg-red-500'}`}></div>
@@ -461,19 +343,13 @@ export default function SpeakingTest() {
                     <div className="flex flex-col items-center space-y-6">
                       {hasCameraPermission && (
                         <div className="relative w-full aspect-video bg-muted rounded-md overflow-hidden">
-                          {isCameraLoading && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-                            </div>
-                          )}
                           <video 
-                            ref={videoRef}
-                            className={`w-full h-full object-cover ${!cameraActive || isCameraLoading ? 'hidden' : ''}`}
-                            autoPlay
-                            playsInline
-                            muted
+                            ref={videoRef} 
+                            className={`w-full h-full object-cover ${!cameraActive ? 'hidden' : ''}`} 
+                            autoPlay 
+                            muted 
                           />
-                          {!cameraActive && !isCameraLoading && (
+                          {!cameraActive && (
                             <div className="absolute inset-0 flex items-center justify-center bg-muted">
                               <CameraOff className="h-12 w-12 text-muted-foreground" />
                             </div>
@@ -542,15 +418,10 @@ export default function SpeakingTest() {
                 >
                   {isLoading ? (
                     <>
-                      <svg className="animate-spin h-5 w-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4zm16 0a8 8 0 01-8 8v-8h8z"></path>
-                      </svg>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Evaluating...
                     </>
-                  ) : (
-                    'Submit Response'
-                  )}
+                  ) : 'Submit Response'}
                 </Button>
               </div>
             </TabsContent>
@@ -626,19 +497,6 @@ export default function SpeakingTest() {
             </div>
           </CardContent>
         </Card>
-      )}
-
-      {isLoading && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50">
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="animate-bounce mb-4">
-              <Mic className="h-8 w-8 text-primary" />
-            </div>
-            <p className="text-lg font-medium animate-pulse">
-              Evaluating your speaking...
-            </p>
-          </div>
-        </div>
       )}
     </div>
   );
