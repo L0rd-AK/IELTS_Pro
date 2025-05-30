@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
+import { useAuth } from '@/contexts/auth-context';
 import { NoRedirectWrapper } from '@/components/auth/no-redirect-wrapper';
 
 export default function PaymentStatus() {
@@ -19,7 +19,7 @@ export default function PaymentStatus() {
   const [paymentStatus, setPaymentStatus] = useState<any>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [hasDownloaded, setHasDownloaded] = useState(false);
-
+   const { user } = useAuth();
   // Effect for fetching payment status
   useEffect(() => {
     const checkStatus = async () => {
@@ -62,7 +62,7 @@ export default function PaymentStatus() {
       doc.text('This is to certify that', 148.5, 50, { align: 'center' });
 
       doc.setFontSize(24);
-      doc.text(paymentStatus.name || 'Student Name', 148.5, 70, { align: 'center' });
+      doc.text(user?.displayName || 'Student Name', 148.5, 70, { align: 'center' });
 
       doc.setFontSize(16);
       doc.text('has successfully completed the IELTS preparation course', 148.5, 90, { align: 'center' });
