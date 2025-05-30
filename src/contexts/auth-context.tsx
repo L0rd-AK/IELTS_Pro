@@ -42,9 +42,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
-      
-      // Redirect to dashboard if user logs in
-      if (user) {
+
+      // Handle redirects based on path
+      const path = window.location.pathname;
+      const isPaymentPage = path.includes('/payment/');
+      const isAuthPage = path === '/login' || path === '/signup';
+
+      // Only redirect to dashboard from auth pages
+      if (user && isAuthPage) {
         router.push('/dashboard');
       }
     });

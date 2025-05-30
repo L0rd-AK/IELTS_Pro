@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { paymentService } from '@/services/payment.service';
 
 export async function POST(request: Request) {
   try {
@@ -9,10 +10,18 @@ export async function POST(request: Request) {
       throw new Error('Transaction ID not found');
     }
 
-    // Redirect to success page with transaction ID
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/payment/success/${tranId}`);
+    // Update payment status in your database
+    await paymentService.updatePaymentStatus(tranId.toString(), 'success');
+      // Redirect to the success page with the transaction ID
+    return NextResponse.redirect(
+      `${process.env.NEXT_PUBLIC_APP_URL}/payment/success/${tranId}`,
+      { status: 303 } // Using 303 for "See Other" redirect after POST
+    );
   } catch (error) {
     console.error('Payment success error:', error);
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/payment/failed`);
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Payment processing failed' 
+    }, { status: 500 });
   }
 }

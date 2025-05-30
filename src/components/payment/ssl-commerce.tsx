@@ -12,7 +12,6 @@ interface PaymentProps {
 
 export function SSLCommercePayment({ amount, onError }: PaymentProps) {
   const [loading, setLoading] = useState(false);
-
   const handlePayment = async () => {
     try {
       setLoading(true);
@@ -21,7 +20,12 @@ export function SSLCommercePayment({ amount, onError }: PaymentProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({
+          amount,
+          packageName: 'IELTS Test Package',
+          name: 'User', // TODO: Get from auth context
+          email: 'user@example.com', // TODO: Get from auth context
+        }),
       });
 
       const data = await response.json();
@@ -30,10 +34,12 @@ export function SSLCommercePayment({ amount, onError }: PaymentProps) {
         throw new Error(data.error || 'Payment initialization failed');
       }
       
-      if (data.url) {
+      // Validate the gateway URL
+      if (data.url && data.url.startsWith('https://sandbox.sslcommerz.com/')) {
         window.location.href = data.url;
       } else {
-        throw new Error('Invalid payment URL');
+        console.error('Invalid URL received:', data.url);
+        throw new Error('Invalid payment gateway URL received');
       }
     } catch (error) {
       console.error('Payment error:', error);
