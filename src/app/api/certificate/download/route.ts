@@ -22,30 +22,20 @@ export async function GET(request: Request) {
         { error: 'Payment verification failed' },
         { status: 402 }
       );
-    }    try {
-      // Create a new PDF document
-      const doc = new PDFDocument({
-        size: 'A4',
-        layout: 'landscape',
-        margin: 50,
-        info: {
-          Title: 'IELTS Certificate',
-          Author: 'IELTS Pro',
-          Subject: 'IELTS Achievement Certificate',
-        }
-      });
+    }
 
-      // Create arrays to collect PDF chunks
-      const chunks: Buffer[] = [];
-      
-      // Handle errors in PDF generation
-      doc.on('error', (err) => {
-        console.error('PDF generation error:', err);
-        throw err;
-      });
-      
-      // Collect PDF data chunks
-      doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+    // Create a new PDF document
+    const doc = new PDFDocument({
+      size: 'A4',
+      layout: 'landscape',
+      margin: 50,
+      info: {
+        Title: 'IELTS Certificate',
+        Author: 'IELTS Pro',
+        Subject: 'IELTS Achievement Certificate',
+      }
+    });    // Create array to collect PDF chunks
+    const chunks: Buffer[] = [];
 
     // Add certificate content
     doc.font('Helvetica-Bold')
@@ -90,35 +80,44 @@ export async function GET(request: Request) {
 
     doc.moveDown();
     doc.text(`Issue Date: ${new Date().toLocaleDateString()}`, {
-       align: 'center'
-    });    // Return a promise that resolves with the PDF
+       align: 'center'    });
+
+    // Set up PDF stream handling
+    doc.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+
     return new Promise((resolve, reject) => {
+
       // Handle successful PDF generation
       doc.on('end', () => {
-        try {
-          const pdfBuffer = Buffer.concat(chunks);
-          resolve(new NextResponse(pdfBuffer, {
-            headers: {
-              'Content-Type': 'application/pdf',
-              'Content-Disposition': `attachment; filename="IELTS-Certificate-${tranId}.pdf"`
-            }
-          }));
-        } catch (err) {
-          reject(err);
-        }
+        const pdfBuffer = Buffer.concat(chunks);
+        resolve(new NextResponse(pdfBuffer, {
+          headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="IELTS-Certificate-${tranId}.pdf"`,
+            'Cache-Control': 'no-store'
+          }
+        }));
       });
 
       // Handle errors in PDF generation
-      doc.on('error', reject);
+      doc.on('error', (err) => {
+        console.error('PDF generation error:', err);
+        reject(new Error('Failed to generate PDF'));
+      });
 
       // End the document to trigger generation
       doc.end();
+    }).catch(error => {
+      console.error('Certificate generation error:', error);
+      return NextResponse.json(
+        { error: 'Certificate generation failed' },
+        { status: 500 }
+      );
     });
-
   } catch (error) {
-    console.error('Certificate generation error:', error);
+    console.error('Certificate request error:', error);
     return NextResponse.json(
-      { error: 'Certificate generation failed' },
+      { error: 'Failed to process certificate request' },
       { status: 500 }
     );
   }

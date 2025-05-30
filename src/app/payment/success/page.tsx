@@ -9,22 +9,27 @@ export default function PaymentSuccessPage() {
   const params = useParams();
   const tranId = params?.tranId;
 
-  useEffect(() => {
-    // Automatically trigger certificate download
+  useEffect(() => {    // Automatically trigger certificate download
     const downloadCertificate = async () => {
       try {
-        if (!tranId) throw new Error('No transaction ID found');
-        
-        const response = await fetch(`/api/certificate/download?tranId=${tranId}`);
-        if (!response.ok) {
-          throw new Error('Failed to download certificate');
-        }
-        
-        const blob = await response.blob();
+        // Create demo certificate content
+        const certificateContent = `
+IELTS Certificate of Achievement
+(Demo Certificate)
+
+This is to certify that the student has successfully completed 
+the IELTS preparation course with IELTS Pro.
+
+Certificate ID: DEMO-${Date.now()}
+Issue Date: ${new Date().toLocaleDateString()}
+        `.trim();
+
+        // Create blob with certificate content
+        const blob = new Blob([certificateContent], { type: 'text/plain' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'ielts-certificate.pdf';
+        a.download = 'ielts-demo-certificate.txt';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

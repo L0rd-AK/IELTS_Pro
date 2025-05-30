@@ -44,56 +44,36 @@ export default function PaymentStatus() {
       }
     };
     checkStatus();
-  }, [params.tranId, toast]);
-  const downloadCertificate = async () => {
+  }, [params.tranId, toast]);  const downloadCertificate = async () => {
     try {
       setIsDownloading(true);
       
-      // First check payment status again to ensure it's still valid
-      const currentStatus = await paymentService.getPaymentStatus(params.tranId as string);
-      if (currentStatus.status !== 'success') {
-        throw new Error('Payment verification failed');
-      }      const response = await fetch(`/api/certificate/download?tranId=${params.tranId}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/pdf',
-        },
-      });
-      
-      if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to download certificate');
-        }
-        throw new Error(`Failed to download certificate: ${response.status} ${response.statusText}`);
-      }
-      
-      // Get the content type
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/pdf')) {
-        console.error('Invalid content type:', contentType);
-        throw new Error('Invalid certificate format received');
-      }
-      
-      // Create blob from response
-      const blob = await response.blob();
+      // Create PDF document using jsPDF
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });      // Set font size and add content
+      doc.setFontSize(36);
+      doc.text('IELTS Certificate of Achievement', 148.5, 30, { align: 'center' });
 
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `IELTS-Certificate-${params.tranId}.pdf`;
-      document.body.appendChild(a);
-      
-      // Trigger download
-      a.click();
-      
-      // Cleanup
-      setTimeout(() => {
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      }, 100);
+      doc.setFontSize(16);
+      doc.text('This is to certify that', 148.5, 50, { align: 'center' });
+
+      doc.setFontSize(24);
+      doc.text(paymentStatus.name || 'Student Name', 148.5, 70, { align: 'center' });
+
+      doc.setFontSize(16);
+      doc.text('has successfully completed the IELTS preparation course', 148.5, 90, { align: 'center' });
+
+      doc.setFontSize(20);
+      doc.text(`Overall Band Score: ${paymentStatus.score || '7.0'}`, 148.5, 110, { align: 'center' });
+
+      doc.setFontSize(12);
+      doc.text(`Certificate ID: DEMO-${Date.now()}`, 148.5, 140, { align: 'center' });
+      doc.text(`Issue Date: ${new Date().toLocaleDateString()}`, 148.5, 150, { align: 'center' });      // Save the PDF
+      doc.save('IELTS-Certificate.pdf');
 
       setHasDownloaded(true);
       toast({
