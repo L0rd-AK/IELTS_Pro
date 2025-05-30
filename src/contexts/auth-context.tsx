@@ -8,7 +8,8 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  UserCredential
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
@@ -40,7 +41,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+      if (user) {
+        // Ensure we have the latest user data
+        user.reload().then(() => setUser(auth.currentUser));
+      } else {
+        setUser(null);
+      }
       setLoading(false);
 
       // Handle redirects based on path
@@ -57,10 +63,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe();
   }, [router]);
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (): Promise<UserCredential> => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      return result; // Return the UserCredential
     } catch (error) {
       console.error('Error signing in with Google', error);
       throw error;

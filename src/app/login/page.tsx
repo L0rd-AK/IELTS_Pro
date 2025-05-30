@@ -34,8 +34,10 @@ export default function LoginPage() {
     
     try {
       setLoading(true);
-      
-      router.push('/');
+      // Sign in with email and password
+      await signInWithEmailAndPassword(auth, email, password);
+      // Redirect to home page after successful login
+      router.push('/dashboard');
     } catch (error: any) {
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
         setError('Invalid email or password');
@@ -58,14 +60,8 @@ const handleGoogleSignIn = async () => {
     setLoading(true);
     setError('');
 
-    if (!signInWithGoogle) {
-      throw new Error('Google sign in not initialized');
-    }
-
-    // Try to sign in with Google
-    const result = await (signInWithGoogle() as unknown as Promise<UserCredential>);
-    
-    if (!result || !result.user) {
+    const result = await signInWithGoogle() as UserCredential;
+    if (!result?.user) {
       throw new Error('No user data returned from Google sign in');
     }
 
@@ -74,26 +70,32 @@ const handleGoogleSignIn = async () => {
       email: result.user.email,
       displayName: result.user.displayName || '',
       photoURL: result.user.photoURL || '',
+      uid: result.user.uid, // Add UID
       role: 'user'
     };
 
-    // Post to your API
-    const response = await fetch('http://localhost:5000/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
+    try {
+      // Post to your API
+      const response = await fetch('http://localhost:5000/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      if (!response.ok) {
+        console.warn('User creation in backend failed, but Firebase auth succeeded');
+      } else {
+        const data = await response.json();
+        console.log('User data saved:', data);
+      }
+    } catch (apiError) {
+      console.warn('Backend API error:', apiError);
+      // Continue even if backend fails - user is still authenticated in Firebase
     }
 
-    const data = await response.json();
-    console.log('User data saved:', data);
-
-    // Navigate to dashboard
+    // Navigate to dashboard regardless of backend status
     router.push('/dashboard');
   } catch (error: any) {
     console.error('Sign in error:', error);

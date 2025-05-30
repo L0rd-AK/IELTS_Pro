@@ -26,11 +26,20 @@ export function AuthButtons() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                {user.photoURL ? (
-                  <AvatarImage src={user.photoURL} alt={user.displayName || "User"} />
+                {user?.photoURL ? (
+                  <AvatarImage
+                    src={user?.photoURL}
+                    alt={user.displayName || "User"}
+                    onError={(e) => {
+                      console.error("Failed to load avatar:", e);
+                      e.currentTarget.src = ""; // Clear the failed image
+                    }}
+                  />
                 ) : (
                   <AvatarFallback>
-                    <User className="h-4 w-4" />
+                    {user.displayName
+                      ? user.displayName[0].toUpperCase()
+                      : <User className="h-4 w-4" />}
                   </AvatarFallback>
                 )}
               </Avatar>
@@ -39,14 +48,16 @@ export function AuthButtons() {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user.displayName || user.email}</p>
+                <p className="text-sm font-medium leading-none">
+                  {user.displayName || user.email}
+                </p>
                 <p className="text-xs leading-none text-muted-foreground">
                   {user.email}
                 </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+            <DropdownMenuItem onClick={() => router.push("/dashboard")}>
               Dashboard
             </DropdownMenuItem>
             <DropdownMenuItem onClick={logout}>
